@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Student mechatronics project: an Arduino automatic temperature-controlled fan.">
+<title>Automatic Temperature-Controlled Fan | Mechatronics Project</title>
+<style>
+:root{--navy:#10243a;--blue:#176b87;--cyan:#e4f5f6;--ink:#243447;--muted:#657789;--bg:#f3f7fa;--line:#dce6ed;--white:#fff;--gold:#f0ae4e}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65}
+header{background:linear-gradient(125deg,#10243a,#176b87);color:#fff;padding:22px 6vw 76px}
+nav{max-width:1120px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.5px}nav .links{display:flex;gap:18px;flex-wrap:wrap}nav a{color:#e9f5f8;text-decoration:none;font-size:.92rem}nav a:hover{text-decoration:underline}
+.hero{max-width:1120px;margin:68px auto 0;display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center}
+.eyebrow{text-transform:uppercase;letter-spacing:2px;color:#a9e1e5;font-size:.78rem;font-weight:bold}
+h1{font-size:clamp(2.4rem,5.2vw,4.6rem);line-height:1.06;margin:12px 0 20px;max-width:760px}
+.hero p{font-size:1.12rem;color:#e1edf2;max-width:650px}
+.hero-art{border:1px solid #ffffff45;background:#ffffff12;border-radius:22px;padding:28px;text-align:center}
+.fan{font-size:6rem;line-height:1.2}.hero-art strong{display:block;font-size:1.2rem;margin-top:12px}
+.pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:25px}.pill{border:1px solid #ffffff70;border-radius:30px;padding:5px 12px;font-size:.84rem}
+main{max-width:1120px;margin:-30px auto 70px;padding:0 22px}
+section{background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px;margin:22px 0;box-shadow:0 8px 25px #18334a08;scroll-margin-top:20px}
+.kicker{display:inline-block;background:#e8f4f6;color:var(--blue);font-size:.78rem;font-weight:bold;letter-spacing:.7px;padding:4px 10px;border-radius:30px;margin-bottom:10px}
+h2{color:var(--navy);font-size:1.75rem;line-height:1.25;margin:0 0 12px}h3{color:var(--blue);margin:18px 0 7px}
+.lead{color:var(--muted);font-size:1.06rem;margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.tile{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px}.tile .emoji{font-size:1.8rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+table{width:100%;border-collapse:collapse;margin:14px 0}th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#edf5f8;color:var(--navy)}
+.callout{background:var(--cyan);border-left:4px solid var(--blue);padding:15px 18px;border-radius:8px;margin:16px 0}
+pre{background:#101d2b;color:#e8f3fa;padding:20px;border-radius:12px;overflow:auto;font-size:.86rem;line-height:1.5}
+code{font-family:Consolas,Monaco,monospace}.muted{color:var(--muted)}.placeholder{border:2px dashed #aabac8;border-radius:12px;padding:24px;text-align:center;color:var(--muted);background:#fafcfd;margin:14px 0}
+.steps li{padding:5px 0}.refs a{color:var(--blue)}footer{background:var(--navy);color:#dce8ef;text-align:center;padding:30px 20px}footer a{color:#a9e1e5}
+@media(max-width:760px){.hero{grid-template-columns:1fr;margin-top:42px}.grid,.two{grid-template-columns:1fr}section{padding:23px}nav{align-items:flex-start}nav .links{gap:12px}}
+</style>
+</head>
+<body>
+<header>
+<nav>
+  <div class="brand">⚙️ MECHATRONICS FINAL PROJECT</div>
+  <div class="links">
+    <a href="#overview">Overview</a><a href="#goals">Goals</a><a href="#components">Components</a><a href="#code">Code</a><a href="#progress">Progress</a><a href="#research">Research</a>
+  </div>
+</nav>
+<div class="hero">
+  <div>
+    <div class="eyebrow">Arduino Uno · Sensors · Actuators · Computation</div>
+    <h1>Automatic Temperature-Controlled Fan</h1>
+    <p>A mechatronic system that measures the surrounding temperature and automatically adjusts a fan's operation using an Arduino control algorithm.</p>
+    <div class="pills"><span class="pill">Temperature sensing</span><span class="pill">PWM motor control</span><span class="pill">Automatic cooling</span></div>
+  </div>
+  <div class="hero-art"><div class="fan">🌀</div><strong>Sense · Compute · Respond</strong><p style="color:#e1edf2;margin-bottom:0">A practical demonstration of automatic control.</p></div>
+</div>
+</header>
+<main>
+<section id="overview">
+  <span class="kicker">01 · PROJECT OVERVIEW</span>
+  <h2>What am I building?</h2>
+  <p class="lead">The goal is to make a fan that responds to temperature instead of requiring a person to switch it on and adjust it manually.</p>
+  <p>A temperature sensor measures the surrounding air and sends a signal to the Arduino Uno. The Arduino processes the reading using a control algorithm. It then sends a PWM signal to a motor driver, which controls a DC motor connected to a fan blade. As the measured temperature rises, the fan is programmed to run faster.</p>
+  <div class="grid">
+    <div class="tile"><div class="emoji">🌡️</div><h3>Sensor input</h3><p>A temperature sensor measures the air temperature and sends a signal to the Arduino.</p></div>
+    <div class="tile"><div class="emoji">🧠</div><h3>Computation</h3><p>The Arduino reads the sensor and applies my programmed temperature-based rules.</p></div>
+    <div class="tile"><div class="emoji">🌀</div><h3>Actuator output</h3><p>A DC motor spins the fan blade to create airflow.</p></div>
+  </div>
+</section>
+
+<section id="goals">
+  <span class="kicker">02 · PROJECT GOALS</span>
+  <h2>Minimum viable project (MVP)</h2>
+  <p>The minimum goal is a working system that reads temperature and automatically turns a fan on when the temperature reaches a selected threshold. This will demonstrate a sensor input, an Arduino control decision, and a physical actuator.</p>
+  <ul>
+    <li>Read temperature with a sensor connected to the Arduino.</li>
+    <li>Use an original Arduino program to compare the reading with a threshold.</li>
+    <li>Switch a DC fan on and off through a suitable motor driver.</li>
+    <li>Test and record the system's response.</li>
+  </ul>
+  <h3>Stretch goals</h3>
+  <div class="two">
+    <div class="tile"><strong>1. Variable fan speed</strong><p>Use PWM to select low, medium, and high fan speeds as temperature increases.</p></div>
+    <div class="tile"><strong>2. Temperature display</strong><p>Add an LCD or OLED screen to show the measured temperature and current fan setting.</p></div>
+  </div>
+  <div class="callout"><strong>Initial planned settings:</strong> Below 25°C = off; 25–29°C = low; 30–34°C = medium; 35°C or higher = high. These are starting setpoints and may be adjusted during testing.</div>
+</section>
+
+<section id="components">
+  <span class="kicker">03 · PARTS & DESIGN</span>
+  <h2>Required components</h2>
+  <table><thead><tr><th>Component</th><th>Purpose</th><th>Notes</th></tr></thead><tbody>
+    <tr><td>Arduino Uno</td><td>Main controller</td><td>Reads the sensor and controls the output.</td></tr>
+    <tr><td>Temperature sensor (LM35 or confirmed kit equivalent)</td><td>Sensor input</td><td>Check the exact sensor model before using its wiring and conversion formula.</td></tr>
+    <tr><td>Small DC motor with fan blade</td><td>Actuator</td><td>Choose a motor with a known voltage and current rating.</td></tr>
+    <tr><td>Logic-level MOSFET or suitable motor driver</td><td>Motor control</td><td>Must be rated for the motor's voltage and current.</td></tr>
+    <tr><td>Flyback diode (for a brushed DC motor)</td><td>Motor protection</td><td>Install across the motor terminals with correct polarity.</td></tr>
+    <tr><td>Resistor(s), breadboard, jumper wires</td><td>Connections</td><td>Use values appropriate to the selected driver and sensor.</td></tr>
+    <tr><td>External motor power supply, if needed</td><td>Motor power</td><td>Match the motor's rated voltage/current.</td></tr>
+    <tr><td>Optional LCD/OLED</td><td>Display</td><td>Stretch goal.</td></tr>
+  </tbody></table>
+  <div class="callout"><strong>Electrical safety:</strong> Never power a motor directly from an Arduino I/O pin. Use a suitable motor driver, check component pinouts and ratings, and connect the motor supply ground to Arduino GND. Disconnect power before changing wiring.</div>
+  <h3>System block diagram</h3>
+  <div class="grid">
+    <div class="tile"><h3>Temperature sensor</h3><p>Temperature → electrical signal</p></div>
+    <div class="tile"><h3>Arduino Uno</h3><p>Read → calculate → decide</p></div>
+    <div class="tile"><h3>Driver + fan</h3><p>PWM command → motor speed</p></div>
+  </div>
+  <div class="placeholder">📷 Add a photograph of your actual Arduino, sensor, and motor setup here once assembled.</div>
+  <p class="muted">Wiring details depend on the exact sensor and motor-driver parts in the kit. Confirm those part numbers before following a pin-by-pin wiring diagram.</p>
+</section>
+
+<section id="code">
+  <span class="kicker">04 · PROGRAMMING</span>
+  <h2>Control algorithm</h2>
+  <p>The Arduino will average multiple sensor readings to reduce small fluctuations, convert the reading into temperature, and select a fan command based on temperature ranges. The initial plan uses four fan states:</p>
+  <table><thead><tr><th>Temperature</th><th>Fan setting</th><th>Example PWM</th></tr></thead><tbody>
+    <tr><td>Below 25°C</td><td>Off</td><td>0</td></tr><tr><td>25–29°C</td><td>Low</td><td>100</td></tr><tr><td>30–34°C</td><td>Medium</td><td>170</td></tr><tr><td>35°C or higher</td><td>High</td><td>255</td></tr>
+  </tbody></table>
+  <p class="muted">PWM values are initial commands, not guaranteed motor speeds. The minimum duty cycle required to start a motor depends on the motor and driver.</p>
+  <h3>Starter code — LM35 sensor example</h3>
+  <pre><code>/*
+  Project: Automatic Temperature-Controlled Fan
+  Board: Arduino Uno
+  Sensor: LM35 (confirm sensor model before use)
+  Actuator: DC fan through a suitable motor driver
+
+  AI assistance: ChatGPT (OpenAI)
+  Code and control logic adapted with AI assistance.
+*/
+
+const int sensorPin = A0;
+const int fanPin = 9;
+
+void setup() {
+  pinMode(fanPin, OUTPUT);
+  Serial.begin(9600);
+  analogWrite(fanPin, 0);
+}
+
+void loop() {
+  // Average 10 readings to reduce measurement noise
+  long total = 0;
+  for (int i = 0; i &lt; 10; i++) {
+    total += analogRead(sensorPin);
+    delay(10);
+  }
+
+  float reading = total / 10.0;
+  float voltage = reading * (5.0 / 1023.0);
+
+  // LM35 output is approximately 10 mV per degree C
+  float temperatureC = voltage * 100.0;
+
+  int fanSpeed;
+  if (temperatureC &lt; 25) {
+    fanSpeed = 0;
+  } else if (temperatureC &lt; 30) {
+    fanSpeed = 100;
+  } else if (temperatureC &lt; 35) {
+    fanSpeed = 170;
+  } else {
+    fanSpeed = 255;
+  }
+
+  analogWrite(fanPin, fanSpeed);
+
+  Serial.print("Temperature: ");
+  Serial.print(temperatureC);
+  Serial.print(" C | Fan PWM: ");
+  Serial.println(fanSpeed);
+
+  delay(500);
+}</code></pre>
+  <div class="callout"><strong>Important:</strong> This conversion assumes an LM35 and a 5V analog reference. A TMP36, DHT11, DHT22, or another sensor needs different wiring and/or code. Confirm the sensor model before uploading this program.</div>
+</section>
+
+<section id="progress">
+  <span class="kicker">05 · PROGRESS & SCHEDULE</span>
+  <h2>Project progress</h2>
+  <p>My first phase has focused on selecting the project, identifying the main components, planning the control logic, and researching similar systems. Physical testing still needs to confirm the sensor readings and motor response.</p>
+  <table><thead><tr><th>Milestone</th><th>Target work</th><th>Evidence to document</th></tr></thead><tbody>
+    <tr><td>Check-in 1</td><td>Identify the sensor, connect it, and read temperature values.</td><td>Photo of sensor circuit and Serial Monitor readings.</td></tr>
+    <tr><td>Check-in 2</td><td>Connect the motor driver and demonstrate automatic fan on/off operation.</td><td>Photo/video of motor circuit and demonstration.</td></tr>
+    <tr><td>Final development</td><td>Add PWM speed levels and troubleshoot the complete system.</td><td>Code, test table, and video showing fan responses.</td></tr>
+    <tr><td>Final presentation</td><td>Present the working system and project website.</td><td>Final prototype, demonstration, and documentation.</td></tr>
+  </tbody></table>
+  <h3>Risks and mitigation</h3>
+  <ul>
+    <li><strong>Incorrect temperature readings:</strong> Verify sensor model, wiring, conversion formula, and compare with a thermometer.</li>
+    <li><strong>Motor does not spin:</strong> Check the motor rating, driver pinout, power supply, and wiring.</li>
+    <li><strong>Arduino resets:</strong> Use a suitable separate motor supply when needed and share a common ground.</li>
+    <li><strong>Not enough time for stretch goals:</strong> Finish and test the MVP before adding the display or speed levels.</li>
+  </ul>
+  <div class="placeholder">📷 Add progress photos here: sensor test, wiring, first fan test, and completed prototype.</div>
+</section>
+
+<section id="research">
+  <span class="kicker">06 · RESEARCH & MOTIVATION</span>
+  <h2>Similar projects and real-world use</h2>
+  <p>Temperature-controlled fans are used to cool electronics, enclosures, computers, and indoor spaces. Similar hobby projects commonly use a temperature sensor, a microcontroller, and a transistor or motor driver to switch or vary a fan. Commercial fan controllers may add a dedicated thermal probe, display, multiple fan outputs, and more adjustable settings.</p>
+  <p>My design is intended as a simple educational prototype. Instead of using a finished controller, I will write and test my own Arduino control algorithm so I can understand how sensor readings become physical actions.</p>
+  <h3>Why I chose this project</h3>
+  <p>I chose this project because it is practical, achievable with an Arduino kit, and gives me a chance to connect programming with a physical mechanical output. I want to improve my skills with sensors, motor control, PWM, circuit wiring, and troubleshooting. Someone could use a system like this when automatic cooling is useful and manual fan adjustment is inconvenient.</p>
+  <h3>Research links</h3>
+  <ul class="refs">
+    <li><a href="https://projecthub.arduino.cc/" target="_blank" rel="noopener">Arduino Project Hub</a> — examples and tutorials for Arduino projects.</li>
+    <li><a href="https://www.instructables.com/" target="_blank" rel="noopener">Instructables</a> — community-built electronics and temperature-control projects.</li>
+    <li><a href="https://www.acinfinity.com/" target="_blank" rel="noopener">AC Infinity</a> — commercial ventilation and temperature-control products.</li>
+    <li><a href="https://docs.arduino.cc/" target="_blank" rel="noopener">Arduino Documentation</a> — board, language, and PWM references.</li>
+  </ul>
+  <p class="muted">When using a specific tutorial or product in the final report, cite the exact project or product page you consulted and explain what information you used.</p>
+</section>
+
+<section id="testing">
+  <span class="kicker">07 · TESTING & RESULTS</span>
+  <h2>Test plan</h2>
+  <p>The following are planned test cases. Replace the result column with actual measurements after testing; do not report expected behavior as completed results.</p>
+  <table><thead><tr><th>Test</th><th>Target temperature</th><th>Expected behavior</th><th>Actual result</th></tr></thead><tbody>
+    <tr><td>1</td><td>22°C</td><td>Fan off</td><td>Not tested yet</td></tr>
+    <tr><td>2</td><td>27°C</td><td>Low speed</td><td>Not tested yet</td></tr>
+    <tr><td>3</td><td>32°C</td><td>Medium speed</td><td>Not tested yet</td></tr>
+    <tr><td>4</td><td>37°C</td><td>High speed</td><td>Not tested yet</td></tr>
+  </tbody></table>
+  <h3>Final demonstration</h3>
+  <div class="placeholder">🎥 Add or embed a video of the finished fan responding to temperature changes.</div>
+  <h3>What I learned</h3>
+  <p>After testing, I will summarize what I learned about sensor calibration, PWM motor control, electrical connections, and debugging. I will also describe any changes made to the original design.</p>
+</section>
+
+<section id="references">
+  <span class="kicker">08 · REFERENCES & ACKNOWLEDGMENTS</span>
+  <h2>Sources and acknowledgments</h2>
+  <ul>
+    <li><a href="https://docs.arduino.cc/" target="_blank" rel="noopener">Arduino Documentation</a> — reference for Arduino programming and hardware.</li>
+    <li><a href="https://www.instructables.com/" target="_blank" rel="noopener">Instructables</a> — starting point for researching community electronics projects.</li>
+    <li><a href="https://projecthub.arduino.cc/" target="_blank" rel="noopener">Arduino Project Hub</a> — starting point for researching Arduino project examples.</li>
+  </ul>
+  <p>AI assistance: ChatGPT (OpenAI) was used to help brainstorm the project, organize documentation, and develop an initial code example. The final circuit, code, and test results will be checked against the actual components and documented by the student.</p>
+</section>
+</main>
+<footer>
+  <strong>Automatic Temperature-Controlled Fan</strong>
+  <p>Arduino Mechatronics Final Project · Student project website</p>
+  <p><a href="#top">Back to top</a></p>
+</footer>
+</body>
+</html>
